@@ -37,6 +37,68 @@ class Node {
     while (current.left) current = current.left;
     return current.data;
   }
+
+  findNode(data) {
+    let node;
+    if (data === this.data) return (node = this);
+    else if (data < this.data && this.left) {
+      node = this.left.findNode(data);
+      return node;
+    } else if (data > this.data && this.right) {
+      node = this.right.findNode(data);
+      return node;
+    }
+    return "Data not found";
+  }
+
+  levelOrderNode(callback) {
+    let current = this;
+    const queue = [current];
+    const result = [];
+    while (queue.length > 0) {
+      result.push(current);
+      queue.splice(0, 1);
+      if (current.left) queue.push(current.left);
+      if (current.right) queue.push(current.right);
+      current = queue[0];
+    }
+    return callback(result);
+  }
+
+  displayNodeData(array) {
+    let nodeData = array.map((node) => node.data);
+    return nodeData;
+  }
+
+  inOrderNode(node, result = []) {
+    if (!node) return;
+    else if (node) {
+      this.inOrderNode(node.left, result);
+      result.push(node.data);
+      this.inOrderNode(node.right, result);
+    }
+    return result;
+  }
+
+  preOrderNode(node, result = []) {
+    if (!node) return;
+    else if (node) {
+      result.push(node.data);
+      this.preOrderNode(node.left, result);
+      this.preOrderNode(node.right, result);
+    }
+    return result;
+  }
+
+  postOrderNode(node, result = []) {
+    if (!node) return;
+    else if (node) {
+      this.postOrderNode(node.left, result);
+      this.postOrderNode(node.right, result);
+      result.push(node.data);
+    }
+    return result;
+  }
 }
 
 class Tree {
@@ -71,6 +133,41 @@ class Tree {
   delete(value) {
     if (this.root) {
       this.root = this.root.deleteNode(value);
+    }
+  }
+
+  // Accepts a value and returns the node with the given value
+  find(value) {
+    if (this.root) {
+      return this.root.findNode(value);
+    }
+  }
+
+  // Traverses the tree in breadth-first level order returning an array of BST values
+  levelOrder() {
+    if (this.root) {
+      return this.root.levelOrderNode(this.root.displayNodeData);
+    }
+  }
+
+  // Traverses the tree in Depth-first(In-order) level order returning an array of BST values
+  inOrder() {
+    if (this.root) {
+      return this.root.inOrderNode(this.root);
+    }
+  }
+
+  // Traverses the tree in Depth-first(Pre-order) level order returning an array of BST values
+  preOrder() {
+    if (this.root) {
+      return this.root.preOrderNode(this.root);
+    }
+  }
+
+  // Traverses the tree in Depth-first(Post-order) level order returning an array of BST values
+  postOrder() {
+    if (this.root) {
+      return this.root.postOrderNode(this.root);
     }
   }
 }
