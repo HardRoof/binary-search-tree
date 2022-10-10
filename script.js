@@ -48,7 +48,7 @@ class Node {
       node = this.right.findNode(data);
       return node;
     }
-    return "Data not found";
+    return "Data not found in this tree";
   }
 
   levelOrderNode(callback) {
@@ -98,6 +98,32 @@ class Node {
       result.push(node.data);
     }
     return result;
+  }
+
+  findLeavesNode(node, leaves = []) {
+    if (!node) return;
+    else if (node) {
+      this.findLeavesNode(node.left, leaves);
+      this.findLeavesNode(node.right, leaves);
+      if (!node.right && !node.left) {
+        leaves.push(node);
+      }
+    }
+    return leaves;
+  }
+
+  findHeightNode(leavesArr, nodeDepth) {
+    leavesArr = leavesArr.map((node) => this.findDepthNode(node.data));
+    const deepest = Math.max(...leavesArr);
+    return deepest - nodeDepth;
+  }
+
+  findDepthNode(data, height = -1) {
+    height++;
+    if (data === this.data) return height;
+    else if (data < this.data && this.left) return this.left.findDepthNode(data, height);
+    else if (data > this.data && this.right) return this.right.findDepthNode(data, height);
+    return "Data not found in this tree";
   }
 }
 
@@ -169,5 +195,23 @@ class Tree {
     if (this.root) {
       return this.root.postOrderNode(this.root);
     }
+  }
+
+  // Returns node height
+  findHeight(data) {
+    if (!this.root) return "This tree is empty";
+    else {
+      const node = this.root.findNode(data);
+      const leavesArr = node.findLeavesNode(node);
+      const nodeDepth = this.findDepth(data);
+      return this.root.findHeightNode(leavesArr, nodeDepth);
+    }
+  }
+
+  // Returns node depth
+  findDepth(node) {
+    if (!this.root) {
+      return -1;
+    } else return this.root.findDepthNode(node);
   }
 }
