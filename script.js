@@ -62,7 +62,8 @@ class Node {
       if (current.right) queue.push(current.right);
       current = queue[0];
     }
-    return callback(result);
+    if (callback) return callback(result);
+    return result;
   }
 
   displayNodeData(array) {
@@ -125,6 +126,19 @@ class Node {
     else if (data > this.data && this.right) return this.right.findDepthNode(data, height);
     return "Data not found in this tree";
   }
+
+  isBalancedNode(tree, root) {
+    if (root == null) return true;
+    let leftNode = tree.findHeight(root.left);
+    let rightNode = tree.findHeight(root.right);
+    if (
+      Math.abs(leftNode - rightNode) <= 1 &&
+      this.isBalancedNode(root.left) == true &&
+      this.isBalancedNode(root.right) == true
+    )
+      return true;
+    return false;
+  }
 }
 
 class Tree {
@@ -133,6 +147,7 @@ class Tree {
     this.root = this.buildTree(this.sortedArray);
   }
 
+  // Builds a balanced tree out of an array
   buildTree(sortedArray) {
     if (sortedArray.length === 0) return null;
     let middleIndex = Math.floor(sortedArray.length / 2);
@@ -198,20 +213,36 @@ class Tree {
   }
 
   // Returns node height
-  findHeight(data) {
+  findHeight(node) {
     if (!this.root) return "This tree is empty";
-    else {
-      const node = this.root.findNode(data);
-      const leavesArr = node.findLeavesNode(node);
-      const nodeDepth = this.findDepth(data);
-      return this.root.findHeightNode(leavesArr, nodeDepth);
+    if (!node) return 0;
+    if (!(node instanceof Node)) return "Data not found in this tree";
+    const leavesArr = node.findLeavesNode(node);
+    const nodeDepth = this.findDepth(node.data);
+    return this.root.findHeightNode(leavesArr, nodeDepth);
+  }
+
+  // Returns node depth based on node data
+  findDepth(nodeData) {
+    if (!this.root) {
+      return -1;
+    } else return this.root.findDepthNode(nodeData);
+  }
+
+  // Checks if the tree is balanced
+  isBalanced() {
+    if (this.root) {
+      return this.root.isBalancedNode(this, this.root);
     }
   }
 
-  // Returns node depth
-  findDepth(node) {
-    if (!this.root) {
-      return -1;
-    } else return this.root.findDepthNode(node);
+  // Rebalances an unbalanced tree
+  rebalance() {
+    if (!this.root) console.log("This tree is empty");
+    else if (!this.isBalanced()) {
+      const treeNodes = this.preOrder();
+      let balancedTree = new Tree(treeNodes);
+      return balancedTree;
+    } else console.log("This tree is already balanced");
   }
 }
